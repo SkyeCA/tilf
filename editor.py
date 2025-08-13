@@ -11,7 +11,7 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QToolBar, QStatusBar, QColorDialog,
     QFileDialog, QScrollArea, QMessageBox, QLabel, QSlider,
-    QHBoxLayout, QDockWidget, QVBoxLayout, QPushButton
+    QHBoxLayout, QDockWidget, QVBoxLayout, QPushButton, QMenu
 )
 
 from pixel_canvas import PixelCanvas
@@ -43,7 +43,6 @@ class Tilf(QMainWindow):
 
         self._create_zoom_widget()
         self.tool_actions: List[QAction] = []
-        self._create_menubar()
         self._create_toolbar()
         self._create_preview_dock()
         self._connect_signals()
@@ -98,15 +97,8 @@ class Tilf(QMainWindow):
         )
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
-    def _create_menubar(self) -> None:
-        menu_bar = self.menuBar()
-        help_menu = menu_bar.addMenu("&Help")
-
-        about_action = QAction("&About My PySide6 App", self)
-        about_action.triggered.connect(self._action_about)
-        help_menu.addAction(about_action)
-
     def _create_toolbar(self) -> None:
+        menubar = self.menuBar()
         toolbar = QToolBar("Menu")
         toolbar.setIconSize(QSize(24, 24))
         toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
@@ -114,22 +106,34 @@ class Tilf(QMainWindow):
         self.addToolBar(toolbar)
         style = self.style()
 
+        menus: Dict[str, QMenu] = {
+            "file": menubar.addMenu("File"),
+            "edit": menubar.addMenu("Edit"),
+            "tools":menubar.addMenu("Tools"),
+            "canvas": menubar.addMenu("Canvas"),
+            "options": menubar.addMenu("Options"),
+            "help": menubar.addMenu("Help")
+        }
+
         actions_data: List[Dict[str, Any]] = [
             {
                 "custom_icon": resource_path("assets/icons/file.png"),
                 "text": "New",
+                "menu": "file",
                 "shortcut": "Ctrl+N",
                 "handler": self._action_new
             },
             {
                 "custom_icon": resource_path("assets/icons/open.png"),
                 "text": "Open",
+                "menu": "file",
                 "shortcut": "Ctrl+O",
                 "handler": self._action_open
             },
             {
                 "custom_icon": resource_path("assets/icons/save.png"),
                 "text": "Save",
+                "menu": "file",
                 "shortcut": "Ctrl+S",
                 "handler": self._action_save
             },
@@ -139,12 +143,14 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/arrow_back.png"),
                 "text": "Undo",
+                "menu": "edit",
                 "shortcut": "Ctrl+Z",
                 "handler": self.canvas.undo
             },
             {
                 "custom_icon": resource_path("assets/icons/arrow_forward.png"),
                 "text": "Redo",
+                "menu": "edit",
                 "shortcut": "Ctrl+Y",
                 "handler": self.canvas.redo
             },
@@ -154,6 +160,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/pencil.png"),
                 "text": "Pencil",
+                "menu": "tools",
                 "shortcut": "B",
                 "checkable": True,
                 "tool": "pencil"
@@ -161,6 +168,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/eraser.png"),
                 "text": "Eraser",
+                "menu": "tools",
                 "shortcut": "E",
                 "checkable": True,
                 "tool": "eraser"
@@ -168,6 +176,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/bucket.png"),
                 "text": "Bucket",
+                "menu": "tools",
                 "shortcut": "G",
                 "checkable": True,
                 "tool": "fill"
@@ -175,6 +184,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/picker.png"),
                 "text": "Picker",
+                "menu": "tools",
                 "shortcut": "I",
                 "checkable": True,
                 "tool": "eyedropper"
@@ -182,6 +192,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/square.png"),
                 "text": "Square",
+                "menu": "tools",
                 "shortcut": "R",
                 "checkable": True,
                 "tool": "rect"
@@ -189,6 +200,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/circle.png"),
                 "text": "Circle",
+                "menu": "tools",
                 "shortcut": "C",
                 "checkable": True,
                 "tool": "ellipse"
@@ -199,18 +211,21 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/color.png"),
                 "text": "Color",
+                "menu": "canvas",
                 "handler": self._choose_color,
                 "tooltip": "Choose brush color"
             },
             {
                 "custom_icon": resource_path("assets/icons/background.png"),
                 "text": "Background",
+                "menu": "canvas",
                 "handler": self._choose_background_color,
                 "tooltip": "Choose canvas background color"
             },
             {
                 "custom_icon": resource_path("assets/icons/clear.png"),
                 "text": "Clear",
+                "menu": "canvas",
                 "handler": self._action_clear,
                 "tooltip": "Clear canvas"
             },
@@ -220,6 +235,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/grid.png"),
                 "text": "Grid",
+                "menu": "options",
                 "checkable": True,
                 "checked": self.canvas.is_grid_visible,
                 "handler": self._toggle_grid
@@ -227,6 +243,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/grid_color.png"),
                 "text": "Grid color",
+                "menu": "options",
                 "handler": self._choose_grid_color
             },
             {
@@ -235,6 +252,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/icons/shift.png"),
                 "text": "Shift",
+                "menu": "tools",
                 "handler": self._shift_canvas,
                 "tooltip": "Shift canvas up, down, left, or right by 1px."
             },
@@ -244,6 +262,7 @@ class Tilf(QMainWindow):
             {
                 "custom_icon": resource_path("assets/logo.png"),
                 "text": "About Tilf",
+                "menu": "help",
                 "handler": self._action_about,
                 "tooltip": "About Tilf"
             },
@@ -278,6 +297,9 @@ class Tilf(QMainWindow):
             shortcut_text = f" ({data['shortcut']})" if 'shortcut' in data else ""
             action.setToolTip(f"{tooltip_text}{shortcut_text}")
             toolbar.addAction(action)
+
+            if "menu" in data:
+                menus[data["menu"]].addAction(action)
 
     def _connect_signals(self) -> None:
         self.canvas.pixel_hovered.connect(self._update_status)
