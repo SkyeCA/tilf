@@ -43,6 +43,7 @@ class Tilf(QMainWindow):
 
         self._create_zoom_widget()
         self.tool_actions: List[QAction] = []
+        self._create_menubar()
         self._create_toolbar()
         self._create_preview_dock()
         self._connect_signals()
@@ -96,6 +97,14 @@ class Tilf(QMainWindow):
             QDockWidget.DockWidgetFeature.DockWidgetMovable
         )
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
+
+    def _create_menubar(self) -> None:
+        menu_bar = self.menuBar()
+        help_menu = menu_bar.addMenu("&Help")
+
+        about_action = QAction("&About My PySide6 App", self)
+        about_action.triggered.connect(self._action_about)
+        help_menu.addAction(about_action)
 
     def _create_toolbar(self) -> None:
         toolbar = QToolBar("Menu")
