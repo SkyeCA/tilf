@@ -223,6 +223,13 @@ class Tilf(QMainWindow):
                 "tooltip": "Choose canvas background color"
             },
             {
+                "custom_icon": resource_path("assets/icons/shift.png"),
+                "text": "Shift",
+                "menu": "canvas",
+                "handler": self._shift_canvas,
+                "tooltip": "Shift canvas up, down, left, or right by 1px."
+            },
+            {
                 "custom_icon": resource_path("assets/icons/clear.png"),
                 "text": "Clear",
                 "menu": "canvas",
@@ -245,16 +252,6 @@ class Tilf(QMainWindow):
                 "text": "Grid color",
                 "menu": "options",
                 "handler": self._choose_grid_color
-            },
-            {
-                "sep": True
-            },
-            {
-                "custom_icon": resource_path("assets/icons/shift.png"),
-                "text": "Shift",
-                "menu": "tools",
-                "handler": self._shift_canvas,
-                "tooltip": "Shift canvas up, down, left, or right by 1px."
             },
             {
                 "sep": True
